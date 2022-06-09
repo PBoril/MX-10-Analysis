@@ -59,6 +59,10 @@ def ObjectTypeHistograme(Input, Bins, ScaleType, ObjectType):
     
     
 def Crop(Input):
+    global Xmin
+    global Xmax
+    global Ymin
+    global Ymax
     Rmin=R+1
     Cmin=C+1
     Rmax=0
@@ -75,19 +79,7 @@ def Crop(Input):
                     Rmax=i
                 if j>Cmax:
                     Cmax=j
-    Rdif=Rmax-Rmin+1
-    Cdif=Cmax-Cmin+1
-    for i in range (Rdif+2):
-        temp5=[]
-        for j in range (Cdif+2):
-            temp5.append(0)
-        Output.append(temp5)
-    for i in range (Rdif):
-        for j in range (Cdif):
-            x=i+Rmin
-            y=j+Cmin
-            Output[i+1][j+1]=Input[x][y]
-    return(Output)
+    return(Rmin, Rmax, Cmin, Cmax)
 def ShowSingleObject(DataArray, ObjectArray, ObjectN, Cropping):
     SupportMatrix=[]
     for i in range(R):
@@ -99,10 +91,13 @@ def ShowSingleObject(DataArray, ObjectArray, ObjectN, Cropping):
         for j in range (C):
             if ObjectArray[i][j]==ObjectN:
                 SupportMatrix[i][j]=DataArray[i][j]
-    if (Cropping==False):
+
+    plt.pcolormesh(SupportMatrix, rasterized=True, vmin=0, vmax=np.amax(SupportMatrix))
+    if (Cropping==True):
         plt.pcolormesh(SupportMatrix, rasterized=True, vmin=0, vmax=np.amax(SupportMatrix))
-    elif (Cropping==True):
-        plt.pcolormesh(Crop(SupportMatrix), rasterized=True, vmin=0, vmax=np.amax(Crop(SupportMatrix)))
+        CropRanges=Crop(SupportMatrix)
+        plt.xlim(CropRanges[2]-1,CropRanges[3]+2)
+        plt.ylim(CropRanges[0]-1, CropRanges[1]+2)
     plt.colorbar()
     plt.ylabel("Energy [KeV]", labelpad=-375)
     plt.show()
